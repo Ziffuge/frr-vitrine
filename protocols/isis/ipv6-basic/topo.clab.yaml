@@ -1,0 +1,57 @@
+name: isis-ipv6-basic
+
+topology:
+  groups:
+    router:
+      kind: linux
+      image: aperence/frr
+      network-mode: none  # Deactivate internet connectivity
+      sysctls:
+        net.ipv6.conf.all.forwarding: 1
+      binds:
+        - frr.conf:/etc/frr/daemons 
+        - configs/__clabNodeName__.conf:/etc/frr/frr.conf
+      exec:
+        - sudo touch /etc/frr/vtysh.conf
+  nodes:
+    r1:
+      group: router
+      # exec:
+    r2:
+      group: router
+      # exec:
+    r3:
+      group: router
+      # exec:
+    r4:
+      group: router
+      # exec:
+    host1:
+      kind: linux
+      image: aperence/host 
+      network-mode: none
+      sysctls:
+        net.ipv6.conf.all.forwarding: 1
+      binds: 
+        - configs/host1.sh:/home/setup.sh
+      exec:
+        - sudo bash /home/setup.sh
+    host2:
+      kind: linux
+      image: aperence/host 
+      network-mode: none
+      sysctls:
+        net.ipv6.conf.all.forwarding: 1
+      binds: 
+        - configs/host2.sh:/home/setup.sh
+      exec:
+        - sudo bash /home/setup.sh
+  links:
+    - endpoints: ["r1:eth1", "r2:eth1"]
+    - endpoints: ["r1:eth3", "r3:eth3"]
+    - endpoints: ["r2:eth2", "r3:eth2"]
+    - endpoints: ["r2:eth4", "r4:eth4"]
+    - endpoints: ["r3:eth1", "r4:eth1"]
+    - endpoints: ["r1:eth5", "host1:eth1"]
+    - endpoints: ["r4:eth5", "host2:eth1"]
+
